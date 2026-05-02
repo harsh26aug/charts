@@ -1,8 +1,6 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
-import { User } from './src/entities/User';
-import { RefreshToken } from './src/entities/RefreshToken';
 
 dotenv.config();
 
@@ -15,7 +13,7 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_DATABASE || 'auth_db',
     synchronize: false,
     logging: process.env.NODE_ENV === 'development',
-    entities: [User, RefreshToken],
+    entities: ['src/entities/*.ts'], //[User, RefreshToken, StockPrice],
     migrations: ['src/migrations/*.ts'],
     migrationsTableName: 'migrations',
     subscribers: [],
