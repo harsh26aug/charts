@@ -1,5 +1,5 @@
 import { IsEmail, IsString, MinLength, MaxLength, IsOptional, IsEnum } from 'class-validator';
-import { UserRole } from '../entities/User';
+import { UserRole } from "@entities/User";
 
 export class RegisterDto {
     @IsEmail()

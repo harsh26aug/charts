@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { JwtPayload } from '../types/auth.types';
-import { UserRole } from '../entities/User';
+import { JwtPayload } from "@types/auth.types";
+import { UserRole } from "@entities/User";
 
 declare global {
     namespace Express {

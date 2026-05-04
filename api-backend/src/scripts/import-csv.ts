@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import fs from "fs";
 import csv from "csv-parser";
-import { AppDataSource } from "../../data-source";
-import { NiftyStockPrice } from "../entities/NiftyStockPrice";
+import { AppDataSource } from "@root/data-source";
+import { NiftyStockPrice } from "@entities/NiftyStockPrice";
 
 const FILE_PATH = "./data/NIFTY 50-02-05-2025-to-02-05-2026.csv";
 
