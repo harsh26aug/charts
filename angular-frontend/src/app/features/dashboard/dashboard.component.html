@@ -3,5 +3,7 @@
     (dateRangeChange)="onDateRangeChange($event)"
     (downloadPdf)="exportNiftyTableAsPdf()"
   />
-  <app-nifty50 [dateRange]="dateRange()" />
+  <div class="dashboard-page-content">
+    <app-nifty50 [dateRange]="dateRange()" />
+  </div>
 </div>
