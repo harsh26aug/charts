@@ -1,6 +1,6 @@
 <div class="nifty-card">
   <div class="nifty-card-header">
-    <h3 class="nifty-card-title">Market Data</h3>
+    <h3 class="nifty-card-title">Nifty 50</h3>
     <div class="nifty-header-actions">
       <div class="day-filters">
         <button [class.active]="selectedDayFilter() === null" (click)="onDayFilterChange(null)">All</button>
@@ -23,9 +23,11 @@
       [nzPageIndex]="currentPage()"
       [nzPageSize]="pageSize()"
       [nzShowSizeChanger]="true"
-      [nzPageSizeOptions]="[10, 20, 50]"
+      [nzPageSizeOptions]="[10, 20, 50, 100, 200, 500]"
       [nzScroll]="{ x: '1100px' }"
       nzTableLayout="fixed"
+      (nzPageIndexChange)="onPageChange($event)"
+      (nzPageSizeChange)="onPageSizeChange($event)"
     >
       <thead>
         <tr>
