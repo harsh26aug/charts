@@ -20,6 +20,12 @@
   gap: var(--spacing-sm);
 }
 
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .date-label {
   font-size: 0.875rem;
   color: #666;

@@ -4,6 +4,8 @@ import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/c
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
+import { provideNzIcons } from 'ng-zorro-antd/icon';
+import { DownloadOutline } from '@ant-design/icons-angular/icons';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 
 import { routes } from './app.routes';
@@ -13,6 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideAnimations(),
     provideNzI18n(en_US),
+    provideNzIcons([DownloadOutline]),
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withFetch(), withInterceptorsFromDi()),
     {

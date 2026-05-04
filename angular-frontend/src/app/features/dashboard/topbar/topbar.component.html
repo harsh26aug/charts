@@ -1,6 +1,17 @@
 <div class="topbar">
   <h2 class="topbar-title"></h2>
   <div class="topbar-controls">
+    <button
+      nz-button
+      nzType="default"
+      class="download-btn"
+      (click)="onDownloadPdf()"
+      title="Download Nifty table as PDF"
+      aria-label="Download Nifty table as PDF"
+    >
+      <nz-icon nzType="download" />
+    </button>
+
     <nz-range-picker
       [(ngModel)]="dateRange"
       (ngModelChange)="onDateRangeChange($event)"
