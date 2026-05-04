@@ -1,5 +1,9 @@
 .dashboard-page {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+}
+
+app-nifty50 {
+  display: block;
+  padding: var(--spacing-lg);
 }

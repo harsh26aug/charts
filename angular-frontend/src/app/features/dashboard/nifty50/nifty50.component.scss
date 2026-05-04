@@ -1,7 +1,62 @@
-.nifty-table-container {
+.nifty-card {
   background: var(--card-bg);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.nifty-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.nifty-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.nifty-header-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.day-filters {
+  display: flex;
+  background: #f0f2f5;
+  border-radius: 20px;
+  padding: 4px;
+  gap: 4px;
+
+  button {
+    border: none;
+    background: transparent;
+    padding: 6px 16px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.2s;
+
+    &:hover {
+      color: var(--primary-color);
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    &.active {
+      background: var(--primary-color);
+      color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.nifty-table-container {
   overflow: hidden;
 }
 

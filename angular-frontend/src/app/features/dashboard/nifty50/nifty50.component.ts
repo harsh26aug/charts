@@ -4,6 +4,7 @@ import {
   input,
   inject,
   signal,
+  computed,
   effect,
   untracked,
 } from '@angular/core';
@@ -40,6 +41,20 @@ export class Nifty50Component {
   readonly pagination = signal<StockPagination | null>(null);
   readonly currentPage = signal(1);
   readonly pageSize = signal(10);
+  
+  readonly selectedDayFilter = signal<number | null>(null); // null means 'All'
+
+  readonly filteredData = computed(() => {
+    const dayFilter = this.selectedDayFilter();
+    const currentData = this.data();
+    if (dayFilter === null) {
+      return currentData;
+    }
+    return currentData.filter(record => {
+      const date = new Date(record.tradeDate);
+      return date.getDay() === dayFilter;
+    });
+  });
 
   constructor() {
     this.query$.pipe(
@@ -85,6 +100,10 @@ export class Nifty50Component {
       limit: size,
       ...this.buildDateParams(this.dateRange()),
     });
+  }
+
+  onDayFilterChange(day: number | null): void {
+    this.selectedDayFilter.set(day);
   }
 
   getDiffClass(value: number | null): string {
