@@ -4,14 +4,14 @@ import { Router } from '@angular/router';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { tap, catchError, switchMap, map } from 'rxjs/operators';
 import {
-    User,
-    AuthTokens,
-    LoginRequest,
-    RegisterRequest,
-    AuthResponse,
-    ApiResponse,
-} from '../models/auth.models';
-import { environment } from '../../../environments/environment';
+  User,
+  AuthTokens,
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse,
+  ApiResponse,
+} from '@core/models/auth.models';
+import { environment } from '@env/environment';
 
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';

@@ -1,0 +1,14 @@
+.app-footer {
+  background: var(--primary-color);
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 0.8rem;
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+
+  p {
+    margin: 0;
+  }
+}

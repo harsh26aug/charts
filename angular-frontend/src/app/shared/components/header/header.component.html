@@ -1,0 +1,12 @@
+<header class="app-header">
+  <div class="header-brand">
+    <span class="brand-title">Icon</span>
+  </div>
+  <div class="header-actions">
+    <span class="welcome-text">Welcome, {{ authService.displayName() }}</span>
+    @if (authService.isAdmin()) {
+      <span class="badge badge-admin">Admin</span>
+    }
+    <button class="btn-logout" (click)="logout()">Logout</button>
+  </div>
+</header>

@@ -1,0 +1,41 @@
+.nifty-table-container {
+  background: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.date-cell {
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+}
+
+.cell-main {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.cell-diff {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  margin-top: 2px;
+
+  .pct {
+    opacity: 0.9;
+  }
+}
+
+/* Market color classes */
+.positive {
+  color: var(--positive-color);
+}
+
+.negative {
+  color: var(--negative-color);
+}
+
+.neutral {
+  color: var(--neutral-color);
+}

@@ -1,0 +1,88 @@
+<div class="nifty-table-container">
+  <nz-table
+    #niftyTable
+    [nzData]="data()"
+    [nzFrontPagination]="false"
+    [nzLoading]="isLoading()"
+    [nzTotal]="pagination()?.total ?? 0"
+    [nzPageIndex]="currentPage()"
+    [nzPageSize]="pageSize()"
+    [nzShowSizeChanger]="true"
+    [nzPageSizeOptions]="[10, 20, 50]"
+    (nzPageIndexChange)="onPageChange($event)"
+    (nzPageSizeChange)="onPageSizeChange($event)"
+    [nzScroll]="{ x: '1100px' }"
+    nzTableLayout="fixed"
+  >
+    <thead>
+      <tr>
+        <th nzLeft nzWidth="110px">Date</th>
+        <th nzWidth="160px">Open</th>
+        <th nzWidth="160px">High</th>
+        <th nzWidth="160px">Low</th>
+        <th nzWidth="160px">Close</th>
+        <th nzWidth="160px">Shares Traded</th>
+        <th nzWidth="160px">Turnover (Cr)</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (record of niftyTable.data; track record.tradeDate) {
+        <tr>
+          <td nzLeft class="date-cell">
+            {{ record.tradeDate | date: 'dd MMM yy' }}
+          </td>
+
+          <td>
+            <div class="cell-main">{{ formatPrice(record.price.open) }}</div>
+            <div class="cell-diff" [ngClass]="getDiffClass(record.diff.openDiff)">
+              {{ formatDiff(record.diff.openDiff) }}
+              <span class="pct">&nbsp;({{ formatPct(record.diff.openDiffPct) }})</span>
+            </div>
+          </td>
+
+          <td>
+            <div class="cell-main">{{ formatPrice(record.price.high) }}</div>
+            <div class="cell-diff" [ngClass]="getDiffClass(record.diff.highDiff)">
+              {{ formatDiff(record.diff.highDiff) }}
+              <span class="pct">&nbsp;({{ formatPct(record.diff.highDiffPct) }})</span>
+            </div>
+          </td>
+
+          <td>
+            <div class="cell-main">{{ formatPrice(record.price.low) }}</div>
+            <div class="cell-diff" [ngClass]="getDiffClass(record.diff.lowDiff)">
+              {{ formatDiff(record.diff.lowDiff) }}
+              <span class="pct">&nbsp;({{ formatPct(record.diff.lowDiffPct) }})</span>
+            </div>
+          </td>
+
+          <td>
+            <div class="cell-main" [ngClass]="getDiffClass(record.diff.closeDiff)">
+              {{ formatPrice(record.price.close) }}
+            </div>
+            <div class="cell-diff" [ngClass]="getDiffClass(record.diff.closeDiff)">
+              {{ formatDiff(record.diff.closeDiff) }}
+              <span class="pct">&nbsp;({{ formatPct(record.diff.closeDiffPct) }})</span>
+            </div>
+          </td>
+
+          <td>
+            <div class="cell-main">{{ formatShares(record.price.sharesTraded) }}</div>
+            <div class="cell-diff" [ngClass]="getDiffClass(record.diff.sharesTradedDiff)">
+              {{ formatDiff(record.diff.sharesTradedDiff) }}
+              <span class="pct">&nbsp;({{ formatPct(record.diff.sharesTradedDiffPct) }})</span>
+            </div>
+          </td>
+
+          <td>
+            <div class="cell-main">{{ formatPrice(record.price.turnoverCr) }}</div>
+            <div class="cell-diff" [ngClass]="getDiffClass(record.diff.turnoverCrDiff)">
+              {{ formatDiff(record.diff.turnoverCrDiff) }}
+              <span class="pct">&nbsp;({{ formatPct(record.diff.turnoverCrDiffPct) }})</span>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </nz-table>
+</div>

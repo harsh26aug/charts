@@ -46,9 +46,32 @@ export class StockService {
             .offset(offset)
             .limit(limit);
 
+        if (query.startDate) {
+          queryBuilder.andWhere("price.trade_date >= :startDate", {
+            startDate: query.startDate,
+          });
+        }
+        if (query.endDate) {
+          queryBuilder.andWhere("price.trade_date <= :endDate", {
+            endDate: query.endDate,
+          });
+        }
+
+        const countBuilder = this.stockPriceRepo.createQueryBuilder("price");
+        if (query.startDate) {
+          countBuilder.andWhere("price.trade_date >= :startDate", {
+            startDate: query.startDate,
+          });
+        }
+        if (query.endDate) {
+          countBuilder.andWhere("price.trade_date <= :endDate", {
+            endDate: query.endDate,
+          });
+        }
+
         const [rows, total] = await Promise.all([
-            queryBuilder.getRawMany<NiftyStockRow>(),
-            this.stockPriceRepo.count(),
+          queryBuilder.getRawMany<NiftyStockRow>(),
+          countBuilder.getCount(),
         ]);
 
         const totalPages = total === 0 ? 0 : Math.ceil(total / limit);

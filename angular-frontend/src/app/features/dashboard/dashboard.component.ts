@@ -1,24 +1,20 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
+import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { TopbarComponent } from './topbar/topbar.component';
+import { Nifty50Component } from './nifty50/nifty50.component';
+import { DateRange } from '@core/models/stock.models';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [TopbarComponent, Nifty50Component],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent {
-  readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
+  readonly dateRange = signal<DateRange>(null);
 
-  logout(): void {
-    this.authService.logout().subscribe({
-      next: () => this.router.navigate(['/auth/login']),
-      error: () => this.router.navigate(['/auth/login']),
-    });
+  onDateRangeChange(range: DateRange): void {
+    this.dateRange.set(range);
   }
 }
