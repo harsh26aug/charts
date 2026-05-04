@@ -8,6 +8,7 @@ import authRoutes from "@routes/auth.routes";
 import stockRoutes from "@routes/stock.routes";
 import userRoutes from "@routes/user.routes";
 import { errorHandler } from "@middleware/error.middleware";
+import { authenticate } from "@middleware/auth.middleware";
 
 dotenv.config();
 
@@ -32,8 +33,8 @@ app.get("/health", (_req, res) => {
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/stocks", stockRoutes);
-app.use("/api/users", userRoutes);
+app.use("/api/stocks", authenticate, stockRoutes);
+app.use("/api/users", authenticate, userRoutes);
 
 // 404 fallback
 app.use((_req, res) => {
