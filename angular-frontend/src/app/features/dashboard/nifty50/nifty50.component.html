@@ -44,7 +44,10 @@
         @for (record of niftyTable.data; track record.tradeDate) {
           <tr>
             <td nzLeft class="date-cell">
-              {{ record.tradeDate | date: 'EEE, dd MMM yy' }}
+              <div>{{ record.tradeDate | date: 'EEE, dd MMM yy' }}</div>
+              @if (getBatchLabel(record.tradeDate); as batchLabel) {
+                <span class="batch-tag">{{ batchLabel }}</span>
+              }
             </td>
 
             <td>

@@ -66,6 +66,18 @@
   white-space: nowrap;
 }
 
+.batch-tag {
+  display: inline-flex;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fde8e8;
+  color: #c62828;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
 .cell-main {
   font-size: 0.9375rem;
   font-weight: 500;

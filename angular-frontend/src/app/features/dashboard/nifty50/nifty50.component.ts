@@ -31,6 +31,10 @@ import {
   styleUrl: './nifty50.component.scss',
 })
 export class Nifty50Component {
+  private static readonly tuesdayBatchStartDate = new Date('2025-09-01T00:00:00');
+  private static readonly tuesdayDay = 2;
+  private static readonly thursdayDay = 4;
+
   readonly dateRange = input<DateRange>(null);
 
   private readonly service = inject(Nifty50Service);
@@ -41,7 +45,7 @@ export class Nifty50Component {
   readonly pagination = signal<StockPagination | null>(null);
   readonly currentPage = signal(1);
   readonly pageSize = signal(10);
-  
+
   readonly selectedDayFilter = signal<number | null>(null); // null means 'All'
 
   readonly filteredData = computed(() => {
@@ -50,29 +54,31 @@ export class Nifty50Component {
     if (dayFilter === null) {
       return currentData;
     }
-    return currentData.filter(record => {
+    return currentData.filter((record) => {
       const date = new Date(record.tradeDate);
       return date.getDay() === dayFilter;
     });
   });
 
   constructor() {
-    this.query$.pipe(
-      tap(() => this.isLoading.set(true)),
-      switchMap((params) =>
-        this.service.getNiftyStockHistory(params).pipe(
-          catchError(() => {
-            this.isLoading.set(false);
-            return EMPTY;
-          }),
+    this.query$
+      .pipe(
+        tap(() => this.isLoading.set(true)),
+        switchMap((params) =>
+          this.service.getNiftyStockHistory(params).pipe(
+            catchError(() => {
+              this.isLoading.set(false);
+              return EMPTY;
+            }),
+          ),
         ),
-      ),
-      takeUntilDestroyed(),
-    ).subscribe((res) => {
-      this.data.set(res.data);
-      this.pagination.set(res.pagination);
-      this.isLoading.set(false);
-    });
+        takeUntilDestroyed(),
+      )
+      .subscribe((res) => {
+        this.data.set(res.data);
+        this.pagination.set(res.pagination);
+        this.isLoading.set(false);
+      });
 
     effect(() => {
       const range = this.dateRange();
@@ -134,6 +140,16 @@ export class Nifty50Component {
     return Number(value).toLocaleString('en-IN');
   }
 
+  getBatchLabel(tradeDate: string): string | null {
+    const date = this.parseTradeDate(tradeDate);
+
+    if (this.isTuesdayBatchDate(date)) {
+      return date.getDay() === Nifty50Component.tuesdayDay ? 'Tuesday Batch' : null;
+    }
+
+    return date.getDay() === Nifty50Component.thursdayDay ? 'Thursday Batch' : null;
+  }
+
   private buildDateParams(range: DateRange): Partial<StockQueryParams> {
     if (!range) return {};
     return {
@@ -144,5 +160,13 @@ export class Nifty50Component {
 
   private toIsoDate(date: Date): string {
     return date.toISOString().split('T')[0];
+  }
+
+  private isTuesdayBatchDate(tradeDate: Date): boolean {
+    return tradeDate >= Nifty50Component.tuesdayBatchStartDate;
+  }
+
+  private parseTradeDate(tradeDate: string): Date {
+    return tradeDate.length === 10 ? new Date(`${tradeDate}T00:00:00`) : new Date(tradeDate);
   }
 }
