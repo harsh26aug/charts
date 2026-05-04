@@ -15,6 +15,7 @@ import { environment } from '../../../environments/environment';
 
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
+const USER_KEY = 'auth_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -39,7 +40,10 @@ export class AuthService {
   private refreshInProgress$ = new BehaviorSubject<boolean>(false);
 
   constructor() {
-    this.restoreSession();
+    const stored = localStorage.getItem(USER_KEY);
+    if (stored) {
+      this.currentUser.set(JSON.parse(stored));
+    }
   }
 
   login(credentials: LoginRequest): Observable<User> {
@@ -49,7 +53,7 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, credentials).pipe(
       tap((res) => {
         this.storeTokens(res.data.tokens);
-        this.currentUser.set(res.data.user);
+        this.storeUser(res.data.user);
       }),
       map((res) => res.data.user),
       catchError((err) => {
@@ -68,7 +72,7 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.baseUrl}/register`, data).pipe(
       tap((res) => {
         this.storeTokens(res.data.tokens);
-        this.currentUser.set(res.data.user);
+        this.storeUser(res.data.user);
       }),
       map((res) => res.data.user),
       catchError((err) => {
@@ -136,19 +140,16 @@ export class AuthService {
     localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken);
   }
 
+  private storeUser(user: User): void {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    this.currentUser.set(user);
+  }
+
   private clearSession(): void {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
     this.currentUser.set(null);
     this.router.navigate(['/auth/login']);
-  }
-
-  private restoreSession(): void {
-    const token = this.getAccessToken();
-    if (token) {
-      this.loadProfile().subscribe({
-        error: () => this.clearSession(),
-      });
-    }
   }
 }
