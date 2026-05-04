@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { AppDataSource } from "@root/data-source";
 import authRoutes from "@routes/auth.routes";
+import stockRoutes from "@routes/stock.routes";
 import userRoutes from "@routes/user.routes";
 import { errorHandler } from "@middleware/error.middleware";
 
@@ -31,6 +32,7 @@ app.get("/health", (_req, res) => {
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/stocks", stockRoutes);
 app.use("/api/users", userRoutes);
 
 // 404 fallback
