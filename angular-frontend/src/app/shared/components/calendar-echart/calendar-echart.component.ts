@@ -67,7 +67,23 @@ export class CalendarEchartComponent {
         const xIndex = dayOfWeek - 1;
         const dateStr = `${year}-${String(mon + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         
-        return [xIndex, weekIndex, dateStr, record.price.open, record.price.high, record.price.low, record.price.close];
+        return [
+          xIndex,
+          weekIndex,
+          dateStr,
+          record.price.open,
+          record.price.high,
+          record.price.low,
+          record.price.close,
+          record.diff.openDiff,
+          record.diff.highDiff,
+          record.diff.lowDiff,
+          record.diff.closeDiff,
+          record.diff.openDiffPct,
+          record.diff.highDiffPct,
+          record.diff.lowDiffPct,
+          record.diff.closeDiffPct
+        ];
       })
       .filter(Boolean) as any[];
 
@@ -86,18 +102,21 @@ export class CalendarEchartComponent {
         formatter: (params: any) => {
           if (params.value.length < 7) return '';
           
-          const [_, __, date, open, high, low, close] = params.value;
-          const isPositive = close >= open;
+          const [
+            _, __, date, 
+            open, high, low, close,
+            openDiff, highDiff, lowDiff, closeDiff,
+            openDiffPct, highDiffPct, lowDiffPct, closeDiffPct
+          ] = params.value;
+
+          const isPositive = (closeDiff ?? (close - open)) >= 0;
           const closeColor = isPositive ? '#10b981' : '#ef4444';
+          
           const fmt = (v: number) =>
             Number(v).toLocaleString('en-IN', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             });
-          
-          const change = close - open;
-          const percentChange = (change / open) * 100;
-          const changeSign = change >= 0 ? '+' : '';
           
           const row = (label: string, val: string, color: string = '#1e293b', isBold: boolean = false) => `
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
@@ -106,22 +125,36 @@ export class CalendarEchartComponent {
             </div>
           `;
 
+          const diffInfo = (diff: number | null, pct: number | null) => {
+            if (diff === null || pct === null) return '';
+            const sign = diff >= 0 ? '+' : '';
+            const color = diff >= 0 ? '#10b981' : '#ef4444';
+            return `<span style="color:${color};font-size:11px;font-weight:600;margin-left:8px;">${sign}${fmt(diff)} (${sign}${pct.toFixed(2)}%)</span>`;
+          };
+
+          const fullRow = (label: string, val: number, diff: number | null, pct: number | null, isBold: boolean = false, color: string = '#1e293b') => `
+            <div style="margin-bottom:8px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="color:#64748b;font-size:13px;">${label}</span>
+                <span style="color:${color};font-size:13px;font-weight:${isBold ? '600' : '500'};">${fmt(val)}</span>
+              </div>
+              <div style="text-align:right;margin-top:-2px;">
+                ${diffInfo(diff, pct)}
+              </div>
+            </div>
+          `;
+
           return `
-            <div style="min-width: 180px; font-family: 'Inter', system-ui, sans-serif;">
+            <div style="min-width: 200px; font-family: 'Inter', system-ui, sans-serif;">
               <div style="background-color: #f8fafc; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
                 <div style="font-weight: 600; color: #0f172a; font-size: 14px;">${date}</div>
               </div>
               <div style="padding: 12px 14px;">
-                ${row('Open', fmt(open))}
-                ${row('High', fmt(high))}
-                ${row('Low', fmt(low))}
+                ${fullRow('Open', open, openDiff, openDiffPct)}
+                ${fullRow('High', high, highDiff, highDiffPct)}
+                ${fullRow('Low', low, lowDiff, lowDiffPct)}
                 <div style="height: 1px; background-color: #e2e8f0; margin: 8px 0;"></div>
-                ${row('Close', fmt(close), closeColor, true)}
-                <div style="text-align: right; margin-top: 4px;">
-                  <span style="display: inline-block; padding: 2px 6px; border-radius: 4px; background-color: ${isPositive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color: ${closeColor}; font-size: 12px; font-weight: 600;">
-                    ${changeSign}${fmt(change)} (${changeSign}${percentChange.toFixed(2)}%)
-                  </span>
-                </div>
+                ${fullRow('Close', close, closeDiff, closeDiffPct, true, closeColor)}
               </div>
             </div>
           `;
@@ -236,18 +269,19 @@ export class CalendarEchartComponent {
     
     const open = api.value(3) as number;
     const close = api.value(6) as number;
+    const closeDiff = api.value(10) as number | null;
+    const closeDiffPct = api.value(14) as number | null;
 
-    const isPositive = close >= open;
+    const isPositive = (closeDiff ?? (close - open)) >= 0;
     const closeColor = isPositive ? '#10b981' : '#ef4444';
     
     const fmt = (v: number): string => {
       return Number(v).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
 
-    const change = close - open;
-    const percentChange = (change / open) * 100;
-    const changeSign = change > 0 ? '+' : '';
-    const changeText = `${changeSign}${percentChange.toFixed(2)}%`;
+    const displayPct = closeDiffPct ?? ((close - open) / open * 100);
+    const changeSign = displayPct > 0 ? '+' : '';
+    const changeText = `${changeSign}${displayPct.toFixed(2)}%`;
     const changeBgColor = isPositive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
 
     return {
