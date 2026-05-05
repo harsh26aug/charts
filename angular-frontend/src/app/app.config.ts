@@ -7,8 +7,9 @@ import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
 import { provideNzIcons } from 'ng-zorro-antd/icon';
 import { DownloadOutline } from '@ant-design/icons-angular/icons';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
-
+import * as echarts from 'echarts';
 import { routes } from './app.routes';
+import { provideEchartsCore } from 'ngx-echarts';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -23,5 +24,6 @@ export const appConfig: ApplicationConfig = {
       useClass: AuthInterceptor,
       multi: true,
     },
+    provideEchartsCore({ echarts }),
   ],
 };

@@ -13,7 +13,7 @@ import { Subject, switchMap, tap, catchError, EMPTY } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { Nifty50Service } from './nifty50.service';
+import { Nifty50Service } from '@shared/services/nifty50.service';
 import {
   DateRange,
   NiftyStockRecord,
