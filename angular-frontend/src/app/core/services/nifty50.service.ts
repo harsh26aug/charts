@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { PaginatedNiftyStockResponse, StockQueryParams } from '@core/models/stock.models';
 import { environment } from '@env/environment';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class Nifty50Service {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/stocks/nifty50`;

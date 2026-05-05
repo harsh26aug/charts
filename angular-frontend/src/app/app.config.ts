@@ -6,6 +6,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
 import { provideNzIcons } from 'ng-zorro-antd/icon';
 import { DownloadOutline } from '@ant-design/icons-angular/icons';
+import { provideHighcharts } from 'highcharts-angular';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 
 import { routes } from './app.routes';
@@ -18,6 +19,14 @@ export const appConfig: ApplicationConfig = {
     provideNzIcons([DownloadOutline]),
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withFetch(), withInterceptorsFromDi()),
+    provideHighcharts({
+      instance: () =>
+        import('highcharts/esm/highcharts').then(async (m) => {
+          await import('highcharts/esm/modules/heatmap'); // self-registers heatmap + coloraxis
+          return m.default;
+        }),
+      options: { accessibility: { enabled: false } },
+    }),
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

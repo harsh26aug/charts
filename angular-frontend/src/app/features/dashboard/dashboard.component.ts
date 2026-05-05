@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { TopbarComponent } from './topbar/topbar.component';
 import { Nifty50Component } from './nifty50/nifty50.component';
+import { Nifty50ChartsComponent } from './nifty50-charts/nifty50-charts.component';
 import { DateRange } from '@core/models/stock.models';
 import { toPng } from 'html-to-image';
 import html2canvas from 'html2canvas';
@@ -10,7 +11,7 @@ import { PDFDocument } from 'pdf-lib';
   selector: 'app-dashboard',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TopbarComponent, Nifty50Component],
+  imports: [TopbarComponent, Nifty50ChartsComponent, Nifty50Component],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })

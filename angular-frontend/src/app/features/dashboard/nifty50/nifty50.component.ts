@@ -13,7 +13,7 @@ import { Subject, switchMap, tap, catchError, EMPTY } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { Nifty50Service } from './nifty50.service';
+import { Nifty50Service } from '@core/services/nifty50.service';
 import {
   DateRange,
   NiftyStockRecord,
@@ -25,7 +25,6 @@ import {
   selector: 'app-nifty50',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [Nifty50Service],
   imports: [CommonModule, NzTableModule, NzSpinModule],
   templateUrl: './nifty50.component.html',
   styleUrl: './nifty50.component.scss',

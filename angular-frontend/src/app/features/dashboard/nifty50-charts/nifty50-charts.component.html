@@ -1,0 +1,11 @@
+<div class="nifty-charts-grid">
+  @for (chart of charts; track chart.defaultMonth.getTime(); let i = $index) {
+    <app-calendar-highchart
+      [title]="chart.title"
+      [data]="chart.data()"
+      [isLoading]="chart.isLoading()"
+      [defaultMonth]="chart.defaultMonth"
+      (monthChange)="onMonthChange(i, $event)"
+    />
+  }
+</div>

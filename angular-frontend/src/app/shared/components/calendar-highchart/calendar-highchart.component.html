@@ -1,0 +1,23 @@
+<div class="chart-card">
+  <div class="chart-card-header">
+    <h3 class="chart-card-title">{{ title() }} &middot; {{ selectedMonthLabel() }}</h3>
+    <nz-date-picker
+      nzMode="month"
+      [ngModel]="selectedMonth()"
+      (ngModelChange)="onMonthChange($event)"
+      nzFormat="MMM yyyy"
+      [nzAllowClear]="false"
+    ></nz-date-picker>
+  </div>
+
+  <div class="chart-body">
+    <nz-spin [nzSpinning]="isLoading()">
+      @if (shouldRenderChart()) {
+        <highcharts-chart
+          [options]="chartOptions()"
+          class="chart-canvas"
+        ></highcharts-chart>
+      }
+    </nz-spin>
+  </div>
+</div>
