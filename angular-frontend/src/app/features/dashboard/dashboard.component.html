@@ -1,0 +1,9 @@
+<div class="dashboard-page">
+  <app-topbar
+    (dateRangeChange)="onDateRangeChange($event)"
+    (downloadPdf)="exportNiftyTableAsPdf()"
+  />
+  <div class="dashboard-page-content">
+    <app-nifty50 [dateRange]="dateRange()" />
+  </div>
+</div>
