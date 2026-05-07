@@ -13,7 +13,8 @@
     "migration:show": "npm run typeorm migration:show",
     "nifty50csv:import": "ts-node -r tsconfig-paths/register src/scripts/nifty50-import-csv.ts",
     "nifty50diff:pull": "ts-node -r tsconfig-paths/register src/scripts/nifty50-pull-diff.ts",
-    "sensexcsv:import": "ts-node -r tsconfig-paths/register src/scripts/sensex-import-csv.ts"
+    "sensexcsv:import": "ts-node -r tsconfig-paths/register src/scripts/sensex-import-csv.ts",
+    "sensexdiff:pull": "ts-node -r tsconfig-paths/register src/scripts/sensex-pull-diff.ts"
   },
   "keywords": [],
   "author": "",
