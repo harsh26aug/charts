@@ -12,19 +12,20 @@
           (nzSelectedIndexChange)="selectedIndex.set($event)"
           nzSize="large"
           class="dashboard-custom-tabs">
-          <nz-tab nzTitle="Table View">
+          <nz-tab nzTitle="Calendar View">
             @if(selectedIndex() === 0) {
+              <div class="tab-content">
+                <app-nifty50-charts></app-nifty50-charts>
+                
+              </div>
+            }
+          </nz-tab>
+          <nz-tab nzTitle="Table View">
+            @if(selectedIndex() === 1) {
               <div class="tab-content">
                 <app-nifty50 
                   [dateRange]="dateRange()">
                 </app-nifty50>
-              </div>
-            }
-          </nz-tab>
-          <nz-tab nzTitle="Calendar View">
-            @if(selectedIndex() === 1) {
-              <div class="tab-content">
-                <app-nifty50-charts></app-nifty50-charts>
               </div>
             }
           </nz-tab>

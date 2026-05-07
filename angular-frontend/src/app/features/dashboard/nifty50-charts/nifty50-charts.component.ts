@@ -10,6 +10,8 @@ import { Subject, switchMap, tap, catchError, EMPTY } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 import { Nifty50Service } from '@shared/services/nifty50.service';
 import { NiftyStockRecord, StockQueryParams } from '@core/models/stock.models';
 import { CalendarEchartComponent } from '@shared/components/calendar-echart/calendar-echart.component';
@@ -26,7 +28,14 @@ interface ChartSlot {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [Nifty50Service],
-  imports: [FormsModule, NzDatePickerModule, NzSpinModule, CalendarEchartComponent],
+  imports: [
+    FormsModule,
+    NzDatePickerModule,
+    NzSpinModule,
+    NzButtonModule,
+    NzIconModule,
+    CalendarEchartComponent,
+  ],
   templateUrl: './nifty50-charts.component.html',
   styleUrl: './nifty50-charts.component.scss',
 })
@@ -68,6 +77,45 @@ export class Nifty50ChartsComponent {
     if (!date) return;
     chart.month.set(date);
     chart.query$.next(date);
+  }
+
+  changeMonth(chart: ChartSlot, delta: number): void {
+    const current = chart.month();
+    const nextDate = new Date(current.getFullYear(), current.getMonth() + delta, 1);
+    this.onMonthChange(chart, nextDate);
+  }
+
+  changeYear(chart: ChartSlot, delta: number): void {
+    const current = chart.month();
+    let nextDate = new Date(current.getFullYear() + delta, current.getMonth(), 1);
+    const now = new Date();
+    
+    // Clamp the date so we don't go into a future month of the current year
+    if (nextDate.getFullYear() === now.getFullYear() && nextDate.getMonth() > now.getMonth()) {
+      nextDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    }
+    
+    this.onMonthChange(chart, nextDate);
+  }
+
+  isNextMonthDisabled(chart: ChartSlot): boolean {
+    const current = chart.month();
+    const now = new Date();
+    return (
+      current.getFullYear() > now.getFullYear() ||
+      (current.getFullYear() === now.getFullYear() && current.getMonth() >= now.getMonth())
+    );
+  }
+
+  isNextYearDisabled(chart: ChartSlot): boolean {
+    const current = chart.month();
+    const now = new Date();
+    const nextDate = new Date(current.getFullYear() + 1, current.getMonth(), 1);
+    
+    return (
+      nextDate.getFullYear() > now.getFullYear() ||
+      (nextDate.getFullYear() === now.getFullYear() && nextDate.getMonth() > now.getMonth())
+    );
   }
 
   private createSlot(offset: number): ChartSlot {

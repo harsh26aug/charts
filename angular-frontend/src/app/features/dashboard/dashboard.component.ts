@@ -40,10 +40,10 @@ export class DashboardComponent {
   }
 
   async exportNiftyTableAsPdf(): Promise<void> {
-    const captureTarget = document.querySelector('.nifty-table-container') as HTMLElement | null;
+    const captureTarget = document.querySelector('.dashboard-page') as HTMLElement | null;
 
     if (!captureTarget) {
-      console.error('No .nifty-table-container found for PDF export');
+      console.error('No .dashboard-page found for PDF export');
       return;
     }
 

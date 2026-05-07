@@ -4,8 +4,8 @@
 
 .nifty-charts-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-sm);
   align-items: stretch;
 }
 
@@ -13,10 +13,10 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  gap: 20px;
+  gap: var(--spacing-sm);
   border: 1px solid #cbd5e1;
   border-radius: 12px;
-  padding: 24px;
+  padding: var(--spacing-md);
   background: #ffffff;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease-in-out;
@@ -30,11 +30,24 @@
 .chart-slot-header {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding-bottom: 12px;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
   border-bottom: 1px solid #e2e8f0;
 }
 
+.month-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+
+  &:hover:not([disabled]) {
+    color: #0f172a;
+    background-color: #f1f5f9;
+  }
+}
+
 .month-picker {
-  width: 160px;
+  width: 140px;
 }
