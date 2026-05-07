@@ -46,17 +46,17 @@ export class Nifty50Component {
   readonly currentPage = signal(1);
   readonly pageSize = signal(10);
 
-  readonly selectedDayFilter = signal<number | null>(null); // null means 'All'
+  readonly selectedDayFilters = signal<number[]>([]); // empty means 'All'
 
   readonly filteredData = computed(() => {
-    const dayFilter = this.selectedDayFilter();
+    const dayFilters = this.selectedDayFilters();
     const currentData = this.data();
-    if (dayFilter === null) {
+    if (dayFilters.length === 0) {
       return currentData;
     }
     return currentData.filter((record) => {
       const date = new Date(record.tradeDate);
-      return date.getDay() === dayFilter;
+      return dayFilters.includes(date.getDay());
     });
   });
 
@@ -109,7 +109,16 @@ export class Nifty50Component {
   }
 
   onDayFilterChange(day: number | null): void {
-    this.selectedDayFilter.set(day);
+    if (day === null) {
+      this.selectedDayFilters.set([]);
+    } else {
+      const current = this.selectedDayFilters();
+      if (current.includes(day)) {
+        this.selectedDayFilters.set(current.filter((d) => d !== day));
+      } else {
+        this.selectedDayFilters.set([...current, day]);
+      }
+    }
   }
 
   getDiffClass(value: number | null): string {
