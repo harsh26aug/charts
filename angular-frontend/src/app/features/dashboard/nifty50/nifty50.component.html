@@ -1,14 +1,14 @@
 <div class="nifty-card">
   <div class="nifty-card-header">
-    <h3 class="nifty-card-title">Nifty 50</h3>
+    <h3 class="nifty-card-title">Records</h3>
     <div class="nifty-header-actions">
       <div class="day-filters">
-        <button [class.active]="selectedDayFilter() === null" (click)="onDayFilterChange(null)">All</button>
-        <button [class.active]="selectedDayFilter() === 1" (click)="onDayFilterChange(1)">Mon</button>
-        <button [class.active]="selectedDayFilter() === 2" (click)="onDayFilterChange(2)">Tue</button>
-        <button [class.active]="selectedDayFilter() === 3" (click)="onDayFilterChange(3)">Wed</button>
-        <button [class.active]="selectedDayFilter() === 4" (click)="onDayFilterChange(4)">Thu</button>
-        <button [class.active]="selectedDayFilter() === 5" (click)="onDayFilterChange(5)">Fri</button>
+        <button [class.active]="selectedDayFilters().length === 0" (click)="onDayFilterChange(null)">All</button>
+        <button [class.active]="selectedDayFilters().includes(1)" (click)="onDayFilterChange(1)">Mon</button>
+        <button [class.active]="selectedDayFilters().includes(2)" (click)="onDayFilterChange(2)">Tue</button>
+        <button [class.active]="selectedDayFilters().includes(3)" (click)="onDayFilterChange(3)">Wed</button>
+        <button [class.active]="selectedDayFilters().includes(4)" (click)="onDayFilterChange(4)">Thu</button>
+        <button [class.active]="selectedDayFilters().includes(5)" (click)="onDayFilterChange(5)">Fri</button>
       </div>
     </div>
   </div>
@@ -33,9 +33,9 @@
         <tr>
           <th nzLeft nzWidth="110px">Date</th>
           <th nzWidth="160px">Open</th>
+          <th nzWidth="160px">Close</th>
           <th nzWidth="160px">High</th>
           <th nzWidth="160px">Low</th>
-          <th nzWidth="160px">Close</th>
           <th nzWidth="160px">Shares Traded</th>
           <th nzWidth="160px">Turnover (Cr)</th>
         </tr>
@@ -59,6 +59,16 @@
             </td>
 
             <td>
+              <div class="cell-main" [ngClass]="getDiffClass(record.diff.closeDiff)">
+                {{ formatPrice(record.price.close) }}
+              </div>
+              <div class="cell-diff" [ngClass]="getDiffClass(record.diff.closeDiff)">
+                {{ formatDiff(record.diff.closeDiff) }}
+                <span class="pct">&nbsp;({{ formatPct(record.diff.closeDiffPct) }})</span>
+              </div>
+            </td>
+
+            <td>
               <div class="cell-main">{{ formatPrice(record.price.high) }}</div>
               <div class="cell-diff" [ngClass]="getDiffClass(record.diff.highDiff)">
                 {{ formatDiff(record.diff.highDiff) }}
@@ -71,16 +81,6 @@
               <div class="cell-diff" [ngClass]="getDiffClass(record.diff.lowDiff)">
                 {{ formatDiff(record.diff.lowDiff) }}
                 <span class="pct">&nbsp;({{ formatPct(record.diff.lowDiffPct) }})</span>
-              </div>
-            </td>
-
-            <td>
-              <div class="cell-main" [ngClass]="getDiffClass(record.diff.closeDiff)">
-                {{ formatPrice(record.price.close) }}
-              </div>
-              <div class="cell-diff" [ngClass]="getDiffClass(record.diff.closeDiff)">
-                {{ formatDiff(record.diff.closeDiff) }}
-                <span class="pct">&nbsp;({{ formatPct(record.diff.closeDiffPct) }})</span>
               </div>
             </td>
 

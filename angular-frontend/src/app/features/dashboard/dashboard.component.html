@@ -2,8 +2,39 @@
   <app-topbar
     (dateRangeChange)="onDateRangeChange($event)"
     (downloadPdf)="exportNiftyTableAsPdf()"
+    (menuChange)="onMenuChange($event)"
   />
   <div class="dashboard-page-content">
-    <app-nifty50 [dateRange]="dateRange()" />
+    @if (selectedMenu() === 'Nifty50') {
+      <div class="dashboard-card">
+        <nz-tabs 
+          [nzSelectedIndex]="selectedIndex()" 
+          (nzSelectedIndexChange)="selectedIndex.set($event)"
+          nzSize="large"
+          class="dashboard-custom-tabs">
+          <nz-tab nzTitle="Table View">
+            @if(selectedIndex() === 0) {
+              <div class="tab-content">
+                <app-nifty50 
+                  [dateRange]="dateRange()">
+                </app-nifty50>
+              </div>
+            }
+          </nz-tab>
+          <nz-tab nzTitle="Calendar View">
+            @if(selectedIndex() === 1) {
+              <div class="tab-content">
+                <app-nifty50-charts></app-nifty50-charts>
+              </div>
+            }
+          </nz-tab>
+        </nz-tabs>
+      </div>
+    } @else {
+      <div class="coming-soon">
+        <nz-icon nzType="clock-circle" nzTheme="outline" />
+        <span>Sensex Analysis - Coming Soon</span>
+      </div>
+    }
   </div>
 </div>

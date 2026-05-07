@@ -1,5 +1,13 @@
 <div class="topbar">
-  <h2 class="topbar-title"></h2>
+  <div class="topbar-menu">
+    <nz-radio-group
+      [(ngModel)]="selectedMenu"
+      (ngModelChange)="onMenuChange($event)"
+    >
+      <label nz-radio-button nzValue="Nifty50">Nifty50</label>
+      <label nz-radio-button nzValue="Sensex">Sensex</label>
+    </nz-radio-group>
+  </div>
   <div class="topbar-controls">
     <button
       nz-button

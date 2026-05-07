@@ -1,0 +1,11 @@
+<div class="calendar-chart-wrapper">
+  <nz-spin [nzSpinning]="isLoading()">
+    @if (data().length > 0) {
+      <div echarts [options]="chartOptions()" class="calendar-echart"></div>
+    } @else {
+      <div class="calendar-echart calendar-echart--empty">
+        <span class="empty-text">No data available for this period.</span>
+      </div>
+    }
+  </nz-spin>
+</div>

@@ -1,6 +1,10 @@
 import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { TopbarComponent } from './topbar/topbar.component';
 import { Nifty50Component } from './nifty50/nifty50.component';
+import { Nifty50ChartsComponent } from './nifty50-charts/nifty50-charts.component';
+import { NzTabsComponent, NzTabComponent } from 'ng-zorro-antd/tabs';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 import { DateRange } from '@core/models/stock.models';
 import { toPng } from 'html-to-image';
 import html2canvas from 'html2canvas';
@@ -10,15 +14,29 @@ import { PDFDocument } from 'pdf-lib';
   selector: 'app-dashboard',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TopbarComponent, Nifty50Component],
+  imports: [
+    CommonModule,
+    TopbarComponent,
+    Nifty50ChartsComponent,
+    Nifty50Component,
+    NzTabsComponent,
+    NzTabComponent,
+    NzIconModule,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent {
   readonly dateRange = signal<DateRange>(null);
+  readonly selectedMenu = signal<string>('Nifty50');
+  selectedIndex = signal<number>(0);
 
   onDateRangeChange(range: DateRange): void {
     this.dateRange.set(range);
+  }
+
+  onMenuChange(menu: string): void {
+    this.selectedMenu.set(menu);
   }
 
   async exportNiftyTableAsPdf(): Promise<void> {
