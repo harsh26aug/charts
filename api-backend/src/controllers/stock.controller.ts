@@ -6,12 +6,38 @@ import { getValidatedQuery } from '@middleware/validate.middleware';
 export class StockController {
     private stockService = new StockService();
 
-    getNiftyStockHistory = async (_req: Request, res: Response): Promise<void> => {
-        const result = await this.stockService.getNiftyStockHistory(
-            getValidatedQuery<StockPaginationQueryDto>(res),
-        );
+    getNiftyStockHistory = async (
+      _req: Request,
+      res: Response,
+    ): Promise<void> => {
+      const result = await this.stockService.getNiftyStockHistory(
+        getValidatedQuery<StockPaginationQueryDto>(res),
+      );
 
-        res.status(200).json({ success: true, data: result.items, pagination: result.pagination });
+      res
+        .status(200)
+        .json({
+          success: true,
+          data: result.items,
+          pagination: result.pagination,
+        });
+    };
+
+    getSensexStockHistory = async (
+      _req: Request,
+      res: Response,
+    ): Promise<void> => {
+      const result = await this.stockService.getSensexStockHistory(
+        getValidatedQuery<StockPaginationQueryDto>(res),
+      );
+
+      res
+        .status(200)
+        .json({
+          success: true,
+          data: result.items,
+          pagination: result.pagination,
+        });
     };
 }
 
