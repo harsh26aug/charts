@@ -47,3 +47,32 @@ export interface StockQueryParams {
   startDate?: string;
   endDate?: string;
 }
+
+export interface SensexStockRecord {
+  tradeDate: string;
+  price: {
+    open: number;
+    high: number;
+    low: number;
+    price: number;
+    volume: number;
+  };
+  diff: {
+    openDiff: number | null;
+    highDiff: number | null;
+    lowDiff: number | null;
+    priceDiff: number | null;
+    volumeDiff: number | null;
+    openDiffPct: number | null;
+    highDiffPct: number | null;
+    lowDiffPct: number | null;
+    priceDiffPct: number | null;
+    volumeDiffPct: number | null;
+  };
+}
+
+export interface PaginatedSensexStockResponse {
+  success: boolean;
+  data: SensexStockRecord[];
+  pagination: StockPagination;
+}

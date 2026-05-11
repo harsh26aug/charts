@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { TopbarComponent } from './topbar/topbar.component';
 import { Nifty50Component } from './nifty50/nifty50.component';
 import { Nifty50ChartsComponent } from './nifty50-charts/nifty50-charts.component';
+import { SensexComponent } from './sensex/sensex.component';
+import { SensexChartsComponent } from './sensex-charts/sensex-charts.component';
 import { NzTabsComponent, NzTabComponent } from 'ng-zorro-antd/tabs';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { DateRange } from '@core/models/stock.models';
@@ -19,6 +21,8 @@ import { PDFDocument } from 'pdf-lib';
     TopbarComponent,
     Nifty50ChartsComponent,
     Nifty50Component,
+    SensexComponent,
+    SensexChartsComponent,
     NzTabsComponent,
     NzTabComponent,
     NzIconModule,
@@ -28,8 +32,9 @@ import { PDFDocument } from 'pdf-lib';
 })
 export class DashboardComponent {
   readonly dateRange = signal<DateRange>(null);
-  readonly selectedMenu = signal<string>('Nifty50');
-  selectedIndex = signal<number>(0);
+  readonly selectedMenu = signal<string>('Sensex');
+  niftySelectedIndex = signal<number>(0);
+  sensexSelectedIndex = signal<number>(0);
 
   onDateRangeChange(range: DateRange): void {
     this.dateRange.set(range);

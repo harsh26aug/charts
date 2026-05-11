@@ -19,7 +19,7 @@ export class TopbarComponent {
   readonly downloadPdf = output<void>();
   readonly menuChange = output<string>();
 
-  selectedMenu = 'Nifty50';
+  selectedMenu = 'Sensex';
 
   dateRange: DateRange = null;
 

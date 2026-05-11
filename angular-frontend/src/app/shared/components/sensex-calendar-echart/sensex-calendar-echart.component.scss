@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.calendar-chart-wrapper {
+  width: 100%;
+}
+
+.calendar-echart {
+  width: 100%;
+  height: 400px;
+
+  &--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.empty-text {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-family: 'Inter', system-ui, sans-serif;
+}
