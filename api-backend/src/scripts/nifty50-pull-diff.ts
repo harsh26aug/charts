@@ -5,9 +5,11 @@ const BATCH_SIZE = 1000;
 
 async function run() {
   await AppDataSource.initialize();
+
   console.log("🚀 Incremental SQL diff pipeline starting...");
 
   const queryRunner = AppDataSource.createQueryRunner();
+
   await queryRunner.connect();
 
   // 🔥 Step 1: get last processed trade_date
@@ -28,36 +30,81 @@ async function run() {
       FROM nifty_stock_prices
       WHERE $1::date IS NULL OR trade_date >= $1::date
     ),
+
     ordered AS (
       SELECT
         *,
-        LAG(open) OVER (ORDER BY trade_date) AS prev_open,
-        LAG(high) OVER (ORDER BY trade_date) AS prev_high,
-        LAG(low) OVER (ORDER BY trade_date) AS prev_low,
+
+        -- previous day's CLOSE price
         LAG(close) OVER (ORDER BY trade_date) AS prev_close,
+
+        -- previous day's traded shares
         LAG(shares_traded) OVER (ORDER BY trade_date) AS prev_shares_traded,
+
+        -- previous day's turnover
         LAG(turnover_cr) OVER (ORDER BY trade_date) AS prev_turnover_cr
+
       FROM base
     )
+
     SELECT
       trade_date,
 
-      (open - prev_open) AS open_diff,
-      (high - prev_high) AS high_diff,
-      (low - prev_low) AS low_diff,
+      -- 🔥 compare open/high/low against previous day's CLOSE
+      (open - prev_close) AS open_diff,
+      (high - prev_close) AS high_diff,
+      (low - prev_close) AS low_diff,
+
+      -- 🔥 close-to-close diff
       (close - prev_close) AS close_diff,
+
+      -- 🔥 other diffs
       (shares_traded - prev_shares_traded) AS shares_traded_diff,
       (turnover_cr - prev_turnover_cr) AS turnover_cr_diff,
 
-      CASE WHEN prev_open IS NULL OR prev_open = 0 THEN NULL ELSE (open - prev_open) / prev_open * 100 END AS open_diff_pct,
-      CASE WHEN prev_high IS NULL OR prev_high = 0 THEN NULL ELSE (high - prev_high) / prev_high * 100 END AS high_diff_pct,
-      CASE WHEN prev_low IS NULL OR prev_low = 0 THEN NULL ELSE (low - prev_low) / prev_low * 100 END AS low_diff_pct,
-      CASE WHEN prev_close IS NULL OR prev_close = 0 THEN NULL ELSE (close - prev_close) / prev_close * 100 END AS close_diff_pct,
-      CASE WHEN prev_shares_traded IS NULL OR prev_shares_traded = 0 THEN NULL ELSE (shares_traded - prev_shares_traded) / prev_shares_traded * 100 END AS shares_traded_diff_pct,
-      CASE WHEN prev_turnover_cr IS NULL OR prev_turnover_cr = 0 THEN NULL ELSE (turnover_cr - prev_turnover_cr) / prev_turnover_cr * 100 END AS turnover_cr_diff_pct
+      -- 🔥 percentage diff using previous day's CLOSE
+      CASE
+        WHEN prev_close IS NULL OR prev_close = 0
+        THEN NULL
+        ELSE (open - prev_close) / prev_close * 100
+      END AS open_diff_pct,
+
+      CASE
+        WHEN prev_close IS NULL OR prev_close = 0
+        THEN NULL
+        ELSE (high - prev_close) / prev_close * 100
+      END AS high_diff_pct,
+
+      CASE
+        WHEN prev_close IS NULL OR prev_close = 0
+        THEN NULL
+        ELSE (low - prev_close) / prev_close * 100
+      END AS low_diff_pct,
+
+      -- 🔥 close percentage diff
+      CASE
+        WHEN prev_close IS NULL OR prev_close = 0
+        THEN NULL
+        ELSE (close - prev_close) / prev_close * 100
+      END AS close_diff_pct,
+
+      -- 🔥 shares traded percentage diff
+      CASE
+        WHEN prev_shares_traded IS NULL OR prev_shares_traded = 0
+        THEN NULL
+        ELSE (shares_traded - prev_shares_traded) / prev_shares_traded * 100
+      END AS shares_traded_diff_pct,
+
+      -- 🔥 turnover percentage diff
+      CASE
+        WHEN prev_turnover_cr IS NULL OR prev_turnover_cr = 0
+        THEN NULL
+        ELSE (turnover_cr - prev_turnover_cr) / prev_turnover_cr * 100
+      END AS turnover_cr_diff_pct
 
     FROM ordered
-    WHERE prev_open IS NOT NULL
+
+    WHERE prev_close IS NOT NULL
     `,
     [lastDate],
   );
@@ -111,11 +158,13 @@ async function run() {
         )
         .execute();
 
-      console.log(`Upserted ${batch.length}`);
+      console.log(`✅ Upserted ${batch.length}`);
+
       batch = [];
     }
   }
 
+  // 🔥 Insert remaining rows
   if (batch.length > 0) {
     await queryRunner.manager
       .createQueryBuilder()
@@ -141,16 +190,18 @@ async function run() {
       )
       .execute();
 
-    console.log(`Upserted ${batch.length}`);
+    console.log(`✅ Upserted ${batch.length}`);
   }
 
   await queryRunner.release();
 
   console.log("✅ Done. Incremental pipeline complete.");
+
   process.exit(0);
 }
 
 run().catch((err) => {
   console.error("❌ Error:", err);
+
   process.exit(1);
 });
