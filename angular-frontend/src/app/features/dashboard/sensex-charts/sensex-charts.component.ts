@@ -12,35 +12,35 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { Nifty50Service } from '@shared/services/nifty50.service';
-import { NiftyStockRecord, StockQueryParams } from '@core/models/stock.models';
-import { CalendarEchartComponent } from '@shared/components/calendar-echart/calendar-echart.component';
+import { SensexService } from '@shared/services/sensex.service';
+import { SensexStockRecord, StockQueryParams } from '@core/models/stock.models';
+import { SensexCalendarEchartComponent } from '@shared/components/sensex-calendar-echart/sensex-calendar-echart.component';
 
 interface ChartSlot {
   month: ReturnType<typeof signal<Date>>;
-  data: ReturnType<typeof signal<NiftyStockRecord[]>>;
+  data: ReturnType<typeof signal<SensexStockRecord[]>>;
   isLoading: ReturnType<typeof signal<boolean>>;
   query$: Subject<Date>;
 }
 
 @Component({
-  selector: 'app-nifty50-charts',
+  selector: 'app-sensex-charts',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [Nifty50Service],
+  providers: [SensexService],
   imports: [
     FormsModule,
     NzDatePickerModule,
     NzSpinModule,
     NzButtonModule,
     NzIconModule,
-    CalendarEchartComponent,
+    SensexCalendarEchartComponent,
   ],
-  templateUrl: './nifty50-charts.component.html',
-  styleUrl: './nifty50-charts.component.scss',
+  templateUrl: './sensex-charts.component.html',
+  styleUrl: './sensex-charts.component.scss',
 })
-export class Nifty50ChartsComponent {
-  private readonly service = inject(Nifty50Service);
+export class SensexChartsComponent {
+  private readonly service = inject(SensexService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly charts: ChartSlot[] = Array.from({ length: 4 }, (_, i) =>
@@ -55,7 +55,7 @@ export class Nifty50ChartsComponent {
         .pipe(
           tap(() => chart.isLoading.set(true)),
           switchMap((month) =>
-            this.service.getNiftyStockHistory(this.buildParams(month)).pipe(
+            this.service.getSensexStockHistory(this.buildParams(month)).pipe(
               catchError(() => {
                 chart.isLoading.set(false);
                 return EMPTY;
@@ -89,12 +89,11 @@ export class Nifty50ChartsComponent {
     const current = chart.month();
     let nextDate = new Date(current.getFullYear() + delta, current.getMonth(), 1);
     const now = new Date();
-    
-    // Clamp the date so we don't go into a future month of the current year
+
     if (nextDate.getFullYear() === now.getFullYear() && nextDate.getMonth() > now.getMonth()) {
       nextDate = new Date(now.getFullYear(), now.getMonth(), 1);
     }
-    
+
     this.onMonthChange(chart, nextDate);
   }
 
@@ -111,7 +110,7 @@ export class Nifty50ChartsComponent {
     const current = chart.month();
     const now = new Date();
     const nextDate = new Date(current.getFullYear() + 1, current.getMonth(), 1);
-    
+
     return (
       nextDate.getFullYear() > now.getFullYear() ||
       (nextDate.getFullYear() === now.getFullYear() && nextDate.getMonth() > now.getMonth())
@@ -123,7 +122,7 @@ export class Nifty50ChartsComponent {
     const defaultMonth = new Date(now.getFullYear(), now.getMonth() - offset, 1);
     return {
       month: signal<Date>(defaultMonth),
-      data: signal<NiftyStockRecord[]>([]),
+      data: signal<SensexStockRecord[]>([]),
       isLoading: signal<boolean>(false),
       query$: new Subject<Date>(),
     };

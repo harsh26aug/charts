@@ -16,4 +16,10 @@ router.get(
   asyncHandler(stockController.getNiftyStockHistory),
 );
 
+router.get(
+  "/sensex",
+  validateQueryDto(StockPaginationQueryDto),
+  asyncHandler(stockController.getSensexStockHistory),
+);
+
 export default router;

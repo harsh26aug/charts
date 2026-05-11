@@ -58,3 +58,57 @@ export type NiftyStockRow = {
     sharesTradedDiffPct: number | null;
     turnoverCrDiffPct: number | null;
 };
+
+export type SensexStockRecord = {
+  tradeDate: string;
+  price: {
+    open: number;
+    high: number;
+    low: number;
+    price: number;
+    volume: number;
+  };
+  diff: {
+    openDiff: number | null;
+    highDiff: number | null;
+    lowDiff: number | null;
+    priceDiff: number | null;
+    volumeDiff: number | null;
+    openDiffPct: number | null;
+    highDiffPct: number | null;
+    lowDiffPct: number | null;
+    priceDiffPct: number | null;
+    volumeDiffPct: number | null;
+  };
+};
+
+export type PaginatedSensexStockResponse = {
+  items: SensexStockRecord[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+};
+
+export type SensexStockRow = {
+  tradeDate: string;
+  open: number;
+  high: number;
+  low: number;
+  price: number;
+  volume: number;
+  openDiff: number | null;
+  highDiff: number | null;
+  lowDiff: number | null;
+  priceDiff: number | null;
+  volumeDiff: number | null;
+  openDiffPct: number | null;
+  highDiffPct: number | null;
+  lowDiffPct: number | null;
+  priceDiffPct: number | null;
+  volumeDiffPct: number | null;
+};

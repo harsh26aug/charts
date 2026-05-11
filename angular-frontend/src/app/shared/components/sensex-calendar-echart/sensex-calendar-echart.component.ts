@@ -7,19 +7,19 @@ import {
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import type { EChartsOption } from 'echarts';
-import { NiftyStockRecord } from '@core/models/stock.models';
+import { SensexStockRecord } from '@core/models/stock.models';
 
 @Component({
-  selector: 'app-calendar-echart',
+  selector: 'app-sensex-calendar-echart',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideEchartsCore({ echarts: () => import('echarts') })],
   imports: [NgxEchartsDirective, NzSpinModule],
-  templateUrl: './calendar-echart.component.html',
-  styleUrl: './calendar-echart.component.scss',
+  templateUrl: './sensex-calendar-echart.component.html',
+  styleUrl: './sensex-calendar-echart.component.scss',
 })
-export class CalendarEchartComponent {
-  readonly data = input<NiftyStockRecord[]>([]);
+export class SensexCalendarEchartComponent {
+  readonly data = input<SensexStockRecord[]>([]);
   readonly month = input<Date | null>(null);
   readonly isLoading = input<boolean>(false);
 
@@ -56,7 +56,7 @@ export class CalendarEchartComponent {
     axisLabel:      '#475569',
   } as const;
 
-  private buildOptions(data: NiftyStockRecord[], monthDate: Date): EChartsOption {
+  private buildOptions(data: SensexStockRecord[], monthDate: Date): EChartsOption {
     const year = monthDate.getFullYear();
     const mon = monthDate.getMonth();
 
@@ -91,11 +91,12 @@ export class CalendarEchartComponent {
         const xIndex = dayOfWeek - 1;
         const dateStr = `${year}-${String(mon + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 
+        // Positional layout mirrors Nifty: index 6 = price (close equivalent), index 10 = priceDiff, index 14 = priceDiffPct
         return [
           xIndex, weekIndex, dateStr,
-          record.price.open, record.price.high, record.price.low, record.price.close,
-          record.diff.openDiff, record.diff.highDiff, record.diff.lowDiff, record.diff.closeDiff,
-          record.diff.openDiffPct, record.diff.highDiffPct, record.diff.lowDiffPct, record.diff.closeDiffPct,
+          record.price.open, record.price.high, record.price.low, record.price.price,
+          record.diff.openDiff, record.diff.highDiff, record.diff.lowDiff, record.diff.priceDiff,
+          record.diff.openDiffPct, record.diff.highDiffPct, record.diff.lowDiffPct, record.diff.priceDiffPct,
         ];
       })
       .filter(Boolean) as any[];
@@ -128,13 +129,13 @@ export class CalendarEchartComponent {
 
           const [
             _x, _y, date,
-            open, high, low, close,
-            openDiff, highDiff, lowDiff, closeDiff,
-            openDiffPct, highDiffPct, lowDiffPct, closeDiffPct,
+            open, high, low, price,
+            openDiff, highDiff, lowDiff, priceDiff,
+            openDiffPct, highDiffPct, lowDiffPct, priceDiffPct,
           ] = params.value;
 
-          const isPositive = closeDiff >= 0;
-          const closeColor = isPositive ? this.colors.positive : this.colors.negative;
+          const isPositive = priceDiff >= 0;
+          const priceColor = isPositive ? this.colors.positive : this.colors.negative;
 
           const fmt = (v: number) =>
             Number(v).toLocaleString('en-IN', {
@@ -176,7 +177,7 @@ export class CalendarEchartComponent {
                 ${priceRow('High',  high,  highDiff,  highDiffPct)}
                 ${priceRow('Low',   low,   lowDiff,   lowDiffPct)}
                 <div style="height:1px;background:${this.colors.tooltipBorder};margin:4px 0 8px;"></div>
-                ${priceRow('Close', close, closeDiff, closeDiffPct, true, closeColor)}
+                ${priceRow('Price', price, priceDiff, priceDiffPct, true, priceColor)}
               </div>
             </div>`;
         },
@@ -286,13 +287,13 @@ export class CalendarEchartComponent {
 
     const dateStr      = api.value(2) as string;
     const dayNum       = parseInt(dateStr.split('-')[2], 10).toString();
-    const close        = api.value(6) as number;
-    const closeDiff    = api.value(10) as number;
-    const closeDiffPct = api.value(14) as number;
+    const price        = api.value(6) as number;
+    const priceDiff    = api.value(10) as number;
+    const priceDiffPct = api.value(14) as number;
 
-    const isPositive = closeDiff >= 0;
+    const isPositive = priceDiff >= 0;
 
-    const closeColor   = isPositive ? this.colors.positive       : this.colors.negative;
+    const priceColor   = isPositive ? this.colors.positive       : this.colors.negative;
     const changeBg     = isPositive ? this.colors.positiveBg     : this.colors.negativeBg;
     const changeBorder = isPositive ? this.colors.positiveBorder : this.colors.negativeBorder;
     const cellBorder   = isPositive ? this.colors.positiveBorder : this.colors.negativeBorder;
@@ -303,16 +304,14 @@ export class CalendarEchartComponent {
         maximumFractionDigits: 2,
       });
 
-    const changeSign = closeDiffPct >= 0 ? '+' : '';
-    const changeText = `${changeSign}${closeDiffPct.toFixed(2)}%`;
+    const changeSign = priceDiffPct >= 0 ? '+' : '';
+    const changeText = `${changeSign}${priceDiffPct.toFixed(2)}%`;
 
-    // Compact badge dimensions
     const badgeW = 50;
     const badgeH = 15;
 
-    // Proportional vertical positions — works at any cell height
-    const priceY = y + h * 0.50;   // close price at 50% height
-    const badgeY = y + h * 0.70;   // badge at 70% height
+    const priceY = y + h * 0.50;
+    const badgeY = y + h * 0.70;
 
     return {
       type: 'group',
@@ -344,13 +343,13 @@ export class CalendarEchartComponent {
           },
         },
 
-        // ── Close price
+        // ── Price value
         {
           type: 'text',
           style: {
             x: cx,
             y: priceY,
-            text: fmt(close),
+            text: fmt(price),
             fill: this.colors.textPrimary,
             fontSize: 12,
             fontWeight: 600,
@@ -384,7 +383,7 @@ export class CalendarEchartComponent {
             x: cx,
             y: badgeY + badgeH / 2,
             text: changeText,
-            fill: closeColor,
+            fill: priceColor,
             fontSize: 9,
             fontWeight: 600,
             textAlign: 'center',
