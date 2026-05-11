@@ -43,9 +43,14 @@ export class SensexChartsComponent {
   private readonly service = inject(SensexService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly charts: ChartSlot[] = Array.from({ length: 4 }, (_, i) =>
-    this.createSlot(i),
-  );
+  private readonly chartCount = 4;
+  readonly charts: ChartSlot[] = (() => {
+    const count = this.chartCount;
+    return Array.from(
+      { length: count },
+      (_, i) => this.createSlot(count - i - 1),
+    );
+  })();
 
   readonly disabledFutureDate = (current: Date): boolean => current > new Date();
 
