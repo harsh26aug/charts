@@ -18,7 +18,10 @@ export class AuthInterceptor implements HttpInterceptor {
 
     intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
         const token = this.authService.getAccessToken();
-        const authReq = token ? this.addToken(req, token) : req;
+        const noCacheReq = req.clone({
+          setHeaders: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
+        });
+        const authReq = token ? this.addToken(noCacheReq, token) : noCacheReq;
 
         return next.handle(authReq).pipe(
             catchError((err: HttpErrorResponse) => {

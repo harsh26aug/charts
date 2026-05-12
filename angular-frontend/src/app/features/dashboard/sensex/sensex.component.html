@@ -24,7 +24,7 @@
       [nzPageSize]="pageSize()"
       [nzShowSizeChanger]="true"
       [nzPageSizeOptions]="[10, 20, 50, 100, 200, 500]"
-      [nzScroll]="{ x: '900px' }"
+      [nzScroll]="{ x: '900px', y: 'calc(100vh - 300px)' }"
       nzTableLayout="fixed"
       (nzPageIndexChange)="onPageChange($event)"
       (nzPageSizeChange)="onPageSizeChange($event)"
@@ -32,8 +32,8 @@
       <thead>
         <tr>
           <th nzLeft nzWidth="110px">Date</th>
-          <th nzWidth="160px">Open</th>
           <th nzWidth="160px">Price</th>
+          <th nzWidth="160px">Open</th>
           <th nzWidth="160px">High</th>
           <th nzWidth="160px">Low</th>
           <th nzWidth="160px">Volume</th>
@@ -44,14 +44,9 @@
           <tr>
             <td nzLeft class="date-cell">
               <div>{{ record.tradeDate | date: 'EEE, dd MMM yy' }}</div>
-            </td>
-
-            <td>
-              <div class="cell-main">{{ formatPrice(record.price.open) }}</div>
-              <div class="cell-diff" [ngClass]="getDiffClass(record.diff.openDiff)">
-                {{ formatDiff(record.diff.openDiff) }}
-                <span class="pct">&nbsp;({{ formatPct(record.diff.openDiffPct) }})</span>
-              </div>
+              @if (getBatchLabel(record.tradeDate); as batchLabel) {
+                <span class="batch-tag">{{ batchLabel }}</span>
+              }
             </td>
 
             <td>
@@ -61,6 +56,14 @@
               <div class="cell-diff" [ngClass]="getDiffClass(record.diff.priceDiff)">
                 {{ formatDiff(record.diff.priceDiff) }}
                 <span class="pct">&nbsp;({{ formatPct(record.diff.priceDiffPct) }})</span>
+              </div>
+            </td>
+
+            <td>
+              <div class="cell-main">{{ formatPrice(record.price.open) }}</div>
+              <div class="cell-diff" [ngClass]="getDiffClass(record.diff.openDiff)">
+                {{ formatDiff(record.diff.openDiff) }}
+                <span class="pct">&nbsp;({{ formatPct(record.diff.openDiffPct) }})</span>
               </div>
             </td>
 

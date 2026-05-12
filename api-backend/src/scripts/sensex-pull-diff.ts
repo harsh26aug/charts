@@ -6,9 +6,11 @@ const BATCH_SIZE = 1000;
 
 async function run() {
   await AppDataSource.initialize();
+
   console.log("🚀 Incremental SQL diff pipeline starting...");
 
   const queryRunner = AppDataSource.createQueryRunner();
+
   await queryRunner.connect();
 
   // 🔥 Step 1: get last processed trade_date
@@ -29,33 +31,70 @@ async function run() {
       FROM sensex_stock_prices
       WHERE $1::date IS NULL OR trade_date >= $1::date
     ),
+
     ordered AS (
       SELECT
         *,
-        LAG(open) OVER (ORDER BY trade_date) AS prev_open,
-        LAG(high) OVER (ORDER BY trade_date) AS prev_high,
-        LAG(low) OVER (ORDER BY trade_date) AS prev_low,
+
+        -- previous day's CLOSE price
         LAG(price) OVER (ORDER BY trade_date) AS prev_price,
+
+        -- previous day's volume
         LAG(volume) OVER (ORDER BY trade_date) AS prev_volume
+
       FROM base
     )
+
     SELECT
       trade_date,
 
-      (open - prev_open) AS open_diff,
-      (high - prev_high) AS high_diff,
-      (low - prev_low) AS low_diff,
+      -- 🔥 compare open/high/low against previous day's PRICE
+      (open - prev_price) AS open_diff,
+      (high - prev_price) AS high_diff,
+      (low - prev_price) AS low_diff,
+
+      -- 🔥 normal close-to-close diff
       (price - prev_price) AS price_diff,
+
+      -- 🔥 volume diff
       (volume - prev_volume) AS volume_diff,
 
-      CASE WHEN prev_open IS NULL OR prev_open = 0 THEN NULL ELSE (open - prev_open) / prev_open * 100 END AS open_diff_pct,
-      CASE WHEN prev_high IS NULL OR prev_high = 0 THEN NULL ELSE (high - prev_high) / prev_high * 100 END AS high_diff_pct,
-      CASE WHEN prev_low IS NULL OR prev_low = 0 THEN NULL ELSE (low - prev_low) / prev_low * 100 END AS low_diff_pct,
-      CASE WHEN prev_price IS NULL OR prev_price = 0 THEN NULL ELSE (price - prev_price) / prev_price * 100 END AS price_diff_pct,
-      CASE WHEN prev_volume IS NULL OR prev_volume = 0 THEN NULL ELSE (volume - prev_volume) / prev_volume * 100 END AS volume_diff_pct
+      -- 🔥 percentage diff using previous day's PRICE
+      CASE
+        WHEN prev_price IS NULL OR prev_price = 0
+        THEN NULL
+        ELSE (open - prev_price) / prev_price * 100
+      END AS open_diff_pct,
+
+      CASE
+        WHEN prev_price IS NULL OR prev_price = 0
+        THEN NULL
+        ELSE (high - prev_price) / prev_price * 100
+      END AS high_diff_pct,
+
+      CASE
+        WHEN prev_price IS NULL OR prev_price = 0
+        THEN NULL
+        ELSE (low - prev_price) / prev_price * 100
+      END AS low_diff_pct,
+
+      -- 🔥 close price percentage diff
+      CASE
+        WHEN prev_price IS NULL OR prev_price = 0
+        THEN NULL
+        ELSE (price - prev_price) / prev_price * 100
+      END AS price_diff_pct,
+
+      -- 🔥 volume percentage diff
+      CASE
+        WHEN prev_volume IS NULL OR prev_volume = 0
+        THEN NULL
+        ELSE (volume - prev_volume) / prev_volume * 100
+      END AS volume_diff_pct
 
     FROM ordered
-    WHERE prev_open IS NOT NULL
+
+    WHERE prev_price IS NOT NULL
     `,
     [lastDate],
   );
@@ -105,11 +144,13 @@ async function run() {
         )
         .execute();
 
-      console.log(`Upserted ${batch.length}`);
+      console.log(`✅ Upserted ${batch.length}`);
+
       batch = [];
     }
   }
 
+  // 🔥 Insert remaining rows
   if (batch.length > 0) {
     await queryRunner.manager
       .createQueryBuilder()
@@ -133,16 +174,18 @@ async function run() {
       )
       .execute();
 
-    console.log(`Upserted ${batch.length}`);
+    console.log(`✅ Upserted ${batch.length}`);
   }
 
   await queryRunner.release();
 
   console.log("✅ Done. Incremental pipeline complete.");
+
   process.exit(0);
 }
 
 run().catch((err) => {
   console.error("❌ Error:", err);
+
   process.exit(1);
 });

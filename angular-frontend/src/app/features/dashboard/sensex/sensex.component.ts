@@ -31,6 +31,10 @@ import {
   styleUrl: './sensex.component.scss',
 })
 export class SensexComponent {
+  private static readonly tuesdayBatchStartDate = new Date('2025-09-01T00:00:00');
+  private static readonly tuesdayDay = 2;
+  private static readonly thursdayDay = 4;
+
   readonly dateRange = input<DateRange>(null);
 
   private readonly service = inject(SensexService);
@@ -155,5 +159,23 @@ export class SensexComponent {
 
   private toIsoDate(date: Date): string {
     return date.toISOString().split('T')[0];
+  }
+
+  private isTuesdayBatchDate(tradeDate: Date): boolean {
+    return tradeDate < SensexComponent.tuesdayBatchStartDate;
+  }
+
+  private parseTradeDate(tradeDate: string): Date {
+    return tradeDate.length === 10 ? new Date(`${tradeDate}T00:00:00`) : new Date(tradeDate);
+  }
+
+    getBatchLabel(tradeDate: string): string | null {
+    const date = this.parseTradeDate(tradeDate);
+
+    if (this.isTuesdayBatchDate(date)) {
+      return date.getDay() === SensexComponent.tuesdayDay ? 'Tuesday Batch' : null;
+    }
+
+    return date.getDay() === SensexComponent.thursdayDay ? 'Thursday Batch' : null;
   }
 }

@@ -24,7 +24,7 @@
       [nzPageSize]="pageSize()"
       [nzShowSizeChanger]="true"
       [nzPageSizeOptions]="[10, 20, 50, 100, 200, 500]"
-      [nzScroll]="{ x: '1100px' }"
+      [nzScroll]="{ x: '1100px', y: 'calc(100vh - 300px)' }"
       nzTableLayout="fixed"
       (nzPageIndexChange)="onPageChange($event)"
       (nzPageSizeChange)="onPageSizeChange($event)"
@@ -32,8 +32,8 @@
       <thead>
         <tr>
           <th nzLeft nzWidth="110px">Date</th>
-          <th nzWidth="160px">Open</th>
           <th nzWidth="160px">Close</th>
+          <th nzWidth="160px">Open</th>
           <th nzWidth="160px">High</th>
           <th nzWidth="160px">Low</th>
           <th nzWidth="160px">Shares Traded</th>
@@ -51,20 +51,20 @@
             </td>
 
             <td>
-              <div class="cell-main">{{ formatPrice(record.price.open) }}</div>
-              <div class="cell-diff" [ngClass]="getDiffClass(record.diff.openDiff)">
-                {{ formatDiff(record.diff.openDiff) }}
-                <span class="pct">&nbsp;({{ formatPct(record.diff.openDiffPct) }})</span>
-              </div>
-            </td>
-
-            <td>
               <div class="cell-main" [ngClass]="getDiffClass(record.diff.closeDiff)">
                 {{ formatPrice(record.price.close) }}
               </div>
               <div class="cell-diff" [ngClass]="getDiffClass(record.diff.closeDiff)">
                 {{ formatDiff(record.diff.closeDiff) }}
                 <span class="pct">&nbsp;({{ formatPct(record.diff.closeDiffPct) }})</span>
+              </div>
+            </td>
+
+            <td>
+              <div class="cell-main">{{ formatPrice(record.price.open) }}</div>
+              <div class="cell-diff" [ngClass]="getDiffClass(record.diff.openDiff)">
+                {{ formatDiff(record.diff.openDiff) }}
+                <span class="pct">&nbsp;({{ formatPct(record.diff.openDiffPct) }})</span>
               </div>
             </td>
 
