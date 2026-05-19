@@ -4,7 +4,7 @@ import csv from "csv-parser";
 import { AppDataSource } from "@root/data-source";
 import { NiftyStockPrice } from "@entities/NiftyStockPrice";
 
-const FILE_PATH = "./data/nifty/NIFTY 50-04-05-2026-to-11-05-2026.csv";
+const FILE_PATH = "./data/nifty/nifty.csv";
 
 const BATCH_SIZE = 500;
 
