@@ -5,7 +5,7 @@ import { AppDataSource } from "@root/data-source";
 import { SensexStockPrice } from "@entities/SensexStockPrice";
 import stripBom from "strip-bom-stream";
 
-const FILE_PATH = "./data/sensex/BSE Sensex 30 Historical Data.csv";
+const FILE_PATH = "./data/sensex/sensex.csv";
 
 const BATCH_SIZE = 500;
 
