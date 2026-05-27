@@ -16,13 +16,15 @@
     "nifty50": "npm run nifty50csv:import && npm run nifty50diff:pull",
     "sensexcsv:import": "ts-node -r tsconfig-paths/register src/scripts/sensex-import-csv.ts",
     "sensexdiff:pull": "ts-node -r tsconfig-paths/register src/scripts/sensex-pull-diff.ts",
-    "sensex": "npm run sensexcsv:import && npm run sensexdiff:pull"
+    "sensex": "npm run sensexcsv:import && npm run sensexdiff:pull",
+    "elastic:sync": "ts-node -r tsconfig-paths/register src/scripts/elastic-sync-stocks.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@elastic/elasticsearch": "^8.15.2",
     "bcryptjs": "^3.0.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",

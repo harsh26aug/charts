@@ -22,4 +22,16 @@ router.get(
   asyncHandler(stockController.getSensexStockHistory),
 );
 
+router.get(
+  "/nifty50/elastic",
+  validateQueryDto(StockPaginationQueryDto),
+  asyncHandler(stockController.getNiftyStockHistoryElastic),
+);
+
+router.get(
+  "/sensex/elastic",
+  validateQueryDto(StockPaginationQueryDto),
+  asyncHandler(stockController.getSensexStockHistoryElastic),
+);
+
 export default router;

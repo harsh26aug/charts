@@ -5,6 +5,10 @@ import { SensexStockPrice } from "@entities/SensexStockPrice";
 import { SensexStockPriceDiff } from "@entities/SensexStockPriceDiff";
 import { StockPaginationQueryDto } from "@dto/stock.dto";
 import {
+  elasticsearchClient,
+  elasticsearchIndices,
+} from "@config/elasticsearch";
+import {
   NiftyStockRow,
   PaginatedNiftyStockResponse,
   SensexStockRow,
@@ -14,6 +18,33 @@ import {
 export class StockService {
   private stockPriceRepo = AppDataSource.getRepository(NiftyStockPrice);
   private sensexPriceRepo = AppDataSource.getRepository(SensexStockPrice);
+
+  private buildDateRange(
+    query: StockPaginationQueryDto,
+  ): Record<string, string> {
+    const range: Record<string, string> = {};
+
+    if (query.startDate) {
+      range.gte = query.startDate;
+    }
+    if (query.endDate) {
+      range.lte = query.endDate;
+    }
+
+    return range;
+  }
+
+  private getTotalHits(total: { value: number } | number | undefined): number {
+    if (typeof total === "number") {
+      return total;
+    }
+
+    if (total && typeof total.value === "number") {
+      return total.value;
+    }
+
+    return 0;
+  }
 
   async getNiftyStockHistory(
     query: StockPaginationQueryDto,
@@ -210,6 +241,151 @@ export class StockService {
           volumeDiffPct: row.volumeDiffPct,
         },
       })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: totalPages > 0 && page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
+
+  async getNiftyStockHistoryElastic(
+    query: StockPaginationQueryDto,
+  ): Promise<PaginatedNiftyStockResponse> {
+    const page = query.page;
+    const limit = query.limit;
+    const offset = (page - 1) * limit;
+
+    const range = this.buildDateRange(query);
+    const hasDateFilter = Object.keys(range).length > 0;
+
+    const result = await elasticsearchClient.search<{
+      tradeDate: string;
+      price: {
+        open: number;
+        high: number;
+        low: number;
+        close: number;
+        sharesTraded: number;
+        turnoverCr: number;
+      };
+      diff: {
+        openDiff: number | null;
+        highDiff: number | null;
+        lowDiff: number | null;
+        closeDiff: number | null;
+        sharesTradedDiff: number | null;
+        turnoverCrDiff: number | null;
+        openDiffPct: number | null;
+        highDiffPct: number | null;
+        lowDiffPct: number | null;
+        closeDiffPct: number | null;
+        sharesTradedDiffPct: number | null;
+        turnoverCrDiffPct: number | null;
+      };
+    }>({
+      index: elasticsearchIndices.nifty,
+      from: offset,
+      size: limit,
+      track_total_hits: true,
+      sort: [{ tradeDate: { order: "desc" } }],
+      query: hasDateFilter
+        ? {
+            range: {
+              tradeDate: range,
+            },
+          }
+        : {
+            match_all: {},
+          },
+    });
+
+    const total = this.getTotalHits(
+      result.hits.total as { value: number } | number,
+    );
+    const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+    const items = result.hits.hits
+      .map((hit) => hit._source)
+      .filter((source): source is NonNullable<typeof source> =>
+        Boolean(source),
+      );
+
+    return {
+      items,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: totalPages > 0 && page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
+
+  async getSensexStockHistoryElastic(
+    query: StockPaginationQueryDto,
+  ): Promise<PaginatedSensexStockResponse> {
+    const page = query.page;
+    const limit = query.limit;
+    const offset = (page - 1) * limit;
+
+    const range = this.buildDateRange(query);
+    const hasDateFilter = Object.keys(range).length > 0;
+
+    const result = await elasticsearchClient.search<{
+      tradeDate: string;
+      price: {
+        open: number;
+        high: number;
+        low: number;
+        price: number;
+        volume: number;
+      };
+      diff: {
+        openDiff: number | null;
+        highDiff: number | null;
+        lowDiff: number | null;
+        priceDiff: number | null;
+        volumeDiff: number | null;
+        openDiffPct: number | null;
+        highDiffPct: number | null;
+        lowDiffPct: number | null;
+        priceDiffPct: number | null;
+        volumeDiffPct: number | null;
+      };
+    }>({
+      index: elasticsearchIndices.sensex,
+      from: offset,
+      size: limit,
+      track_total_hits: true,
+      sort: [{ tradeDate: { order: "desc" } }],
+      query: hasDateFilter
+        ? {
+            range: {
+              tradeDate: range,
+            },
+          }
+        : {
+            match_all: {},
+          },
+    });
+
+    const total = this.getTotalHits(
+      result.hits.total as { value: number } | number,
+    );
+    const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+    const items = result.hits.hits
+      .map((hit) => hit._source)
+      .filter((source): source is NonNullable<typeof source> =>
+        Boolean(source),
+      );
+
+    return {
+      items,
       pagination: {
         page,
         limit,

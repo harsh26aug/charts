@@ -31,13 +31,41 @@ export class StockController {
         getValidatedQuery<StockPaginationQueryDto>(res),
       );
 
-      res
-        .status(200)
-        .json({
-          success: true,
-          data: result.items,
-          pagination: result.pagination,
-        });
+      res.status(200).json({
+        success: true,
+        data: result.items,
+        pagination: result.pagination,
+      });
+    };
+
+    getNiftyStockHistoryElastic = async (
+      _req: Request,
+      res: Response,
+    ): Promise<void> => {
+      const result = await this.stockService.getNiftyStockHistoryElastic(
+        getValidatedQuery<StockPaginationQueryDto>(res),
+      );
+
+      res.status(200).json({
+        success: true,
+        data: result.items,
+        pagination: result.pagination,
+      });
+    };
+
+    getSensexStockHistoryElastic = async (
+      _req: Request,
+      res: Response,
+    ): Promise<void> => {
+      const result = await this.stockService.getSensexStockHistoryElastic(
+        getValidatedQuery<StockPaginationQueryDto>(res),
+      );
+
+      res.status(200).json({
+        success: true,
+        data: result.items,
+        pagination: result.pagination,
+      });
     };
 }
 
