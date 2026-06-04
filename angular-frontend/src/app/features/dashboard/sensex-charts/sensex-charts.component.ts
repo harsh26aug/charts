@@ -16,9 +16,19 @@ import { SensexService } from '@shared/services/sensex.service';
 import { SensexStockRecord, StockQueryParams } from '@core/models/stock.models';
 import { SensexCalendarEchartComponent } from '@shared/components/sensex-calendar-echart/sensex-calendar-echart.component';
 
+interface ChartPriceSummary {
+  startDate: string | null;
+  startPrice: number | null;
+  endDate: string | null;
+  endPrice: number | null;
+  diff: number | null;
+  diffPct: number | null;
+}
+
 interface ChartSlot {
   month: ReturnType<typeof signal<Date>>;
   data: ReturnType<typeof signal<SensexStockRecord[]>>;
+  summary: ReturnType<typeof signal<ChartPriceSummary>>;
   isLoading: ReturnType<typeof signal<boolean>>;
   query$: Subject<Date>;
 }
@@ -71,6 +81,7 @@ export class SensexChartsComponent {
         )
         .subscribe((res) => {
           chart.data.set(res.data);
+          chart.summary.set(this.buildPriceSummary(res.data));
           chart.isLoading.set(false);
         });
 
@@ -122,14 +133,107 @@ export class SensexChartsComponent {
     );
   }
 
+  getDiffClass(diff: number | null): string {
+    if (diff === null || diff === 0) {
+      return 'price-diff-neutral';
+    }
+
+    return diff > 0 ? 'price-diff-positive' : 'price-diff-negative';
+  }
+
+  formatTradeDate(value: string | null): string {
+    if (!value) {
+      return '--';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return '--';
+    }
+
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+    });
+  }
+
+  formatPrice(value: number | null): string {
+    if (value === null) {
+      return '--';
+    }
+
+    return value.toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+
+  formatDiff(value: number | null): string {
+    if (value === null) {
+      return '--';
+    }
+
+    const sign = value > 0 ? '+' : '';
+    return `${sign}${this.formatPrice(value)}`;
+  }
+
+  formatDiffPct(value: number | null): string {
+    if (value === null) {
+      return '--';
+    }
+
+    const sign = value > 0 ? '+' : '';
+    return `${sign}${value.toFixed(2)}%`;
+  }
+
   private createSlot(offset: number): ChartSlot {
     const now = new Date();
     const defaultMonth = new Date(now.getFullYear(), now.getMonth() - offset, 1);
     return {
       month: signal<Date>(defaultMonth),
       data: signal<SensexStockRecord[]>([]),
+      summary: signal<ChartPriceSummary>({
+        startDate: null,
+        startPrice: null,
+        endDate: null,
+        endPrice: null,
+        diff: null,
+        diffPct: null,
+      }),
       isLoading: signal<boolean>(false),
       query$: new Subject<Date>(),
+    };
+  }
+
+  private buildPriceSummary(data: SensexStockRecord[]): ChartPriceSummary {
+    if (!data.length) {
+      return {
+        startDate: null,
+        startPrice: null,
+        endDate: null,
+        endPrice: null,
+        diff: null,
+        diffPct: null,
+      };
+    }
+
+    const sorted = [...data].sort(
+      (a, b) => new Date(a.tradeDate).getTime() - new Date(b.tradeDate).getTime(),
+    );
+    const start = sorted[0];
+    const end = sorted[sorted.length - 1];
+    const startPrice = start.price.price;
+    const endPrice = end.price.price;
+    const diff = endPrice - startPrice;
+    const diffPct = startPrice === 0 ? null : (diff / startPrice) * 100;
+
+    return {
+      startDate: start.tradeDate,
+      startPrice,
+      endDate: end.tradeDate,
+      endPrice,
+      diff,
+      diffPct,
     };
   }
 

@@ -1,0 +1,53 @@
+services:
+  frontend1:
+    build: ./angular-frontend
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./angular-frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  frontend2:
+    build: ./react-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./react-frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: charts
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./api-backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: charts
+    volumes:
+      - ./api-backend:/app
+      - /app/node_modules
